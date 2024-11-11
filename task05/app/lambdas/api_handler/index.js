@@ -26,13 +26,15 @@ exports.handler = async (event) => {
             body: content, // Store the content provided
         };
 
+        console.log('New Event:', JSON.stringify(newEvent)); // Log the event to verify structure
+
         // Insert the event into DynamoDB
         await dynamodb.put({
             TableName: TABLE_NAME,
             Item: newEvent,
         }).promise();
 
-        // Return the created event as the response
+        // Return the created event with a 201 status code
         return {
             statusCode: 201,
             body: JSON.stringify({
@@ -42,9 +44,13 @@ exports.handler = async (event) => {
     } catch (error) {
         console.error('Error processing event:', error);
 
+        // Ensure that the statusCode is set correctly in case of an error
         return {
             statusCode: 500,
-            body: JSON.stringify({ message: 'Internal server error', error: error.message }),
+            body: JSON.stringify({
+                message: 'Internal server error',
+                error: error.message,
+            }),
         };
     }
 };
