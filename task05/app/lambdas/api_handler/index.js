@@ -1,56 +1,56 @@
 const AWS = require('aws-sdk');
 const uuid = require('uuid');
-const dynamodb = new AWS.DynamoDB.DocumentClient();
+const moment = require('moment');
 
-// DynamoDB table name
-const TABLE_NAME = 'Events';
+// DynamoDB client setup
+const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-exports.handler = async (event) => {
-    try {
-        // Parse the incoming event
-        const { principalId, content } = JSON.parse(event.body);
+// Hardcoding the table name as "Events"
+const DYNAMODB_TABLE_NAME = process.env.target_table;
 
-        // Ensure principalId and content are provided
-        if (!principalId || !content) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: 'Missing required fields: principalId or content' }),
-            };
-        }
+exports.handler = async (event, context) => {
+  try {
+    // Extracting data from the incoming event
+    const { principalId, content } = event;
+    
+    // Generating a new UUID
+    const newId = uuid.v4();
+    
+    // Getting the current UTC time in ISO 8601 format
+    const currentTime = moment.utc().toISOString();
 
-        // Create a new event object
-        const newEvent = {
-            id: uuid.v4(), // Generate a unique UUID for the event
-            principalId: principalId, // Use the provided principalId
-            createdAt: new Date().toISOString(), // Use current timestamp in ISO 8601 format
-            body: content, // Store the content provided
-        };
+    // Prepare the item to put into DynamoDB
+    const item = {
+      TableName: DYNAMODB_TABLE_NAME,
+      Item: {
+        id: newId,
+        principalId: principalId,
+        createdAt: currentTime,
+        body: content
+      }
+    };
 
-        console.log('New Event:', JSON.stringify(newEvent)); // Log the event to verify structure
+    // Insert the item into the DynamoDB table
+    await dynamoDb.put(item).promise();
 
-        // Insert the event into DynamoDB
-        await dynamodb.put({
-            TableName: TABLE_NAME,
-            Item: newEvent,
-        }).promise();
+    // Prepare the event object to return
+    const eventObj = {
+      id: newId,
+      principalId: principalId,
+      createdAt: currentTime,
+      body: content
+    };
 
-        // Return the created event with a 201 status code
-        return {
-            statusCode: 201,
-            body: JSON.stringify({
-                event: newEvent, // Return the created event
-            }),
-        };
-    } catch (error) {
-        console.error('Error processing event:', error);
-
-        // Ensure that the statusCode is set correctly in case of an error
-        return {
-            statusCode: 500,
-            body: JSON.stringify({
-                message: 'Internal server error',
-                error: error.message,
-            }),
-        };
-    }
+    // Return the response
+    return {
+      statusCode: 201,
+      body: JSON.stringify({ event: eventObj })
+    };
+  } catch (error) {
+    console.error('Error processing request:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Internal Server Error' })
+    };
+  }
 };
