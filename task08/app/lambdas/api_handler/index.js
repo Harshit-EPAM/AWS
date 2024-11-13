@@ -1,29 +1,33 @@
 // Import the OpenMeteoClient class from the Lambda Layer
-const OpenMeteoClient = require('/Users/harshit_godawat/AWS/task08/app/lambdas/layers/lambda_layer/OpenMeteoSDK'); // Path to OpenMeteoClient class in Lambda Layer
+const OpenMeteoClient = require('/opt/nodejs/OpenMeteoSDK');
 
-// Lambda function handler
 exports.handler = async (event) => {
-    // Extract latitude and longitude from the event, with defaults for testing purposes
-    const latitude = event.latitude || 52.52; // Default to 52.52 (Berlin)
-    const longitude = event.longitude || 13.41; // Default to 13.41 (Berlin)
-    
+    const latitude = 52.52;  // You can modify the latitude based on the event or input
+    const longitude = 13.41; // You can modify the longitude based on the event or input
+
     try {
-        // Create an instance of the OpenMeteoClient
-        const client = new OpenMeteoClient();
-        
-        // Fetch the weather data using the provided latitude and longitude
-        const weatherData = await client.getWeather(latitude, longitude);
-        
-        // Return the weather data as a response
+        // Create an instance of OpenMeteoClient
+        const weatherClient = new OpenMeteoClient();
+
+        // Fetch the weather data using the client
+        const weatherData = await weatherClient.getWeather(latitude, longitude);
+
+        // Return a successful response with the weather data
         return {
             statusCode: 200,
-            body: JSON.stringify(weatherData),
+            body: JSON.stringify({
+                message: 'Weather data fetched successfully',
+                data: weatherData
+            })
         };
     } catch (error) {
-        // Handle errors and return a 500 response with the error message
+        // Return an error response if something goes wrong
         return {
             statusCode: 500,
-            body: JSON.stringify({ message: error.message }),
+            body: JSON.stringify({
+                message: 'Failed to fetch weather data',
+                error: error.message
+            })
         };
     }
 };
