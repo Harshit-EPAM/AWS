@@ -1,33 +1,46 @@
-// Import the OpenMeteoClient class from the Lambda Layer
-const OpenMeteoClient = require('/opt/nodejs/OpenMeteoSDK');
+// Lambda Layer Code (OpenMeteoAPI.js)
+const fetch = require('node-fetch'); // You can use the native fetch if running in an environment that supports it (Node.js 18.x and higher supports it natively)
 
-exports.handler = async (event) => {
-    const latitude = 52.52;  // You can modify the latitude based on the event or input
-    const longitude = 13.41; // You can modify the longitude based on the event or input
+class OpenMeteoAPI {
+  constructor(latitude, longitude) {
+    this.latitude = latitude;
+    this.longitude = longitude;
+    this.apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${this.latitude}&longitude=${this.longitude}&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m`;
+  }
 
+  // Function to fetch the latest weather forecast data
+  async getWeatherData() {
     try {
-        // Create an instance of OpenMeteoClient
-        const weatherClient = new OpenMeteoClient();
+      // Make the HTTP request to the Open-Meteo API
+      const response = await fetch(this.apiUrl);
+      
+      // Check if the response status is OK (200)
+      if (!response.ok) {
+        throw new Error(`Error fetching weather data: ${response.statusText}`);
+      }
 
-        // Fetch the weather data using the client
-        const weatherData = await weatherClient.getWeather(latitude, longitude);
+      // Parse the response data as JSON
+      const data = await response.json();
+      
+      // Return the relevant weather data
+      return {
+        current: {
+          temperature: data.current.temperature_2m,
+          windSpeed: data.current.wind_speed_10m
+        },
+        hourly: data.hourly.time.map((time, index) => ({
+          time: time,
+          temperature: data.hourly.temperature_2m[index],
+          humidity: data.hourly.relative_humidity_2m[index],
+          windSpeed: data.hourly.wind_speed_10m[index]
+        }))
+      };
 
-        // Return a successful response with the weather data
-        return {
-            statusCode: 200,
-            body: JSON.stringify({
-                message: 'Weather data fetched successfully',
-                data: weatherData
-            })
-        };
     } catch (error) {
-        // Return an error response if something goes wrong
-        return {
-            statusCode: 500,
-            body: JSON.stringify({
-                message: 'Failed to fetch weather data',
-                error: error.message
-            })
-        };
+      console.error('Error in getWeatherData:', error.message);
+      throw new Error('Failed to fetch weather data');
     }
-};
+  }
+}
+
+module.exports = OpenMeteoAPI;
