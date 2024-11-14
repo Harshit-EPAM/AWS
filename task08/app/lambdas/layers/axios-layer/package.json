@@ -1,5 +1,5 @@
 {
-  "name": "lambda_layer",
+  "name": "axios-layer",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
