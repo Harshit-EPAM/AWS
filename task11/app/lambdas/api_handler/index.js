@@ -272,7 +272,7 @@ exports.handler = async (event) => {
         try {
             const response = await dynamoDB
                 .scan({
-                    TableName: "cmtr-67a26271-Tables-test",
+                    TableName: "-67a26271-Tables-test",
                     FilterExpression: "#number = :tableNumberValue",
                     ExpressionAttributeNames: {
                         "#number": "number", // Ensure "number" is the actual attribute name
