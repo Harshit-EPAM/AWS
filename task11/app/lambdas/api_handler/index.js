@@ -64,10 +64,7 @@ exports.handler = async (event) => {
 
             return {
                 statusCode: 200,
-                headers: { "Content-Type": "application/json" , 'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-'Access-Control-Allow-Origin': '*',
-'Access-Control-Allow-Methods': '*',
-'Accept-Version': '*'},
+                headers: { "Content-Type": "application/json" ,},
                 body: JSON.stringify({ message: "User created successfully" })
             };
         } catch (error) {
@@ -75,10 +72,7 @@ exports.handler = async (event) => {
 
             return {
                 statusCode: 400,
-                headers: { "Content-Type": "application/json" ,'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-'Access-Control-Allow-Origin': '*',
-'Access-Control-Allow-Methods': '*',
-'Accept-Version': '*'},
+                headers: { "Content-Type": "application/json"},
                 body: JSON.stringify({ error: "Signup failed", details: error.message })
             };
         }
@@ -103,10 +97,7 @@ exports.handler = async (event) => {
 
             return {
                 statusCode: 200,
-                headers: { "Content-Type": "application/json" ,'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-'Access-Control-Allow-Origin': '*',
-'Access-Control-Allow-Methods': '*',
-'Accept-Version': '*'},
+                headers: { "Content-Type": "application/json"},
                 body: JSON.stringify({
                     accessToken: data.AuthenticationResult.IdToken ||
                         'blank'
@@ -117,10 +108,7 @@ exports.handler = async (event) => {
 
             return {
                 statusCode: 400,
-                headers: { "Content-Type": "application/json",'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-'Access-Control-Allow-Origin': '*',
-'Access-Control-Allow-Methods': '*',
-'Accept-Version': '*' },
+                headers: { "Content-Type": "application/json",},
                 body: JSON.stringify({ error: "Authentication failed", details: error })
             };
         }
