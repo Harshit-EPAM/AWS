@@ -22,7 +22,8 @@
             "cognito-idp:ListUserPools",
             "cognito-idp:ListUserPoolClients",
             "cognito-idp:AdminRespondToAuthChallenge",
-            "cognito-idp:AdminConfirmSignUp"
+            "cognito-idp:AdminConfirmSignUp",
+            "iam:GetPolicyVersion"
           ],
           "Effect": "Allow",
           "Resource": "*"
@@ -88,12 +89,8 @@
           "Sid": "PublicReadGetObject",
           "Effect": "Allow",
           "Principal": "*",
-          "Action": [
-            "s3:GetObject"
-          ],
-          "Resource": [
-            "arn:aws:s3:::api-ui-hoster/*"
-          ]
+          "Action": ["s3:GetObject"],
+          "Resource": ["arn:aws:s3:::api-ui-hoster/*"]
         }
       ]
     },
@@ -103,7 +100,6 @@
       "block_public_policy": false,
       "restrict_public_buckets": false
     },
-    "tags": {},
     "website_hosting": {
       "enabled": true,
       "index_document": "index.html",
